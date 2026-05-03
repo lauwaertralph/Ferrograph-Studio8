@@ -58,6 +58,9 @@ const byte DBG_IMP = 2; // PORTE_4 - Arduino Pin 2
 //                { D413, D414, D415, D416 }
 byte display[4] = { 0,    0,    0,    0    };
 
+// Used for disabling the counter during reset.
+bool enableCounter = true;
+
 // Keeps track if the counter is more than one hour.
 bool oneHour = false;
 
@@ -294,24 +297,23 @@ void determineCountingDirection() {
 
 void impulseInterrupt() {
   // Called when the IMP signal triggers interrupt.
-
-  if (countingDirectionForward == true) {
-    count(true);
-  } else {
-    count(false);
+  if (enableCounter) {
+    if (countingDirectionForward) {
+      count(true);
+    } else {
+      count(false);
+    }
   }
 }
 
 void checkReset() {
-  // While the counter reset input is low, disable interrupts,
-  // reset the counter, loop around the LED display function.
+  // If the counter reset input is HIGH, disable and reset,
+  // the counter, else enable the counter.
   if (digitalRead(RST) == HIGH) {
-    noInterrupts();
+    enableCounter = false;
     resetCounter();
-    while (digitalRead(RST) == HIGH) {
-      ledDisplay();
-    }
-    interrupts();
+  } else {
+    enableCounter = true;
   }
 }
 
