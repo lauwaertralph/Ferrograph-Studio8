@@ -86,6 +86,11 @@ void setup() {
 
   // Determine the initial counting direction.
   determineCountingDirection();
+
+  // Workaround for initial counter rollover issue.
+  // Unfortunately, setting the ROL pin mode to OUTPUT somehow triggers
+  // the counter rollover at power on and we have to trigger it again to revert.
+  counterRollover(true);
 }
 
 // ############################################################################################################
@@ -94,7 +99,7 @@ void setup() {
 void loop() {
   ledDisplay();
   checkReset();
-  // counterRollover(false);
+  counterRollover(false);
 }
 
 // ############################################################################################################
@@ -156,7 +161,7 @@ void count(bool increment) {
       display[2] = 0;
       display[1] = 0;
       display[0] = 0;
-      // counterRollover(true);
+      counterRollover(true);
     }
   } else {
     if (display[3] > 0) {
@@ -178,27 +183,27 @@ void count(bool increment) {
       display[2] = 5;
       display[1] = 9;
       display[0] = 9;
-      // counterRollover(true);
+      counterRollover(true);
     }
   }
 }
 
-// void counterRollover(bool start) {
-//   unsigned long timeNow = micros();
-//   static unsigned long timelast = 0;
-//   static bool rollover = false;
+void counterRollover(bool start) {
+  unsigned long timeNow = micros();
+  static unsigned long timelast = 0;
+  static bool rollover = false;
 
-//   if (rollover == true) {
-//     if (timeNow - timelast >= rolloverPulseLenght) {
-//       rollover = false;
-//       digitalWrite(ROL, LOW);
-//     }
-//   } else if (start == true) {
-//     timelast = timeNow;
-//     rollover = true;
-//     digitalWrite(ROL, HIGH);
-//   }
-// }
+  if (rollover == true) {
+    if (timeNow - timelast >= rolloverPulseLenght) {
+      rollover = false;
+      digitalWrite(ROL, LOW);
+    }
+  } else if (start == true) {
+    timelast = timeNow;
+    rollover = true;
+    digitalWrite(ROL, HIGH);
+  }
+}
 
 void determineCountingDirection() {
   // Called when the DIR signal changes.
