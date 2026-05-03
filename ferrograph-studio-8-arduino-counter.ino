@@ -97,11 +97,12 @@ void setup() {
 // ############################################################################################################
 void loop() {
   ledDisplay();
+  checkReset();
 
   // Debug Counter
   //        (increment/decrement, interval)
   // debugCount(true,                50000   );
-  debugImpulseInterrupt(50000);
+  // debugImpulseInterrupt(50000);
 }
 
 // ############################################################################################################
@@ -299,6 +300,30 @@ void impulseInterrupt() {
   } else {
     count(false);
   }
+}
+
+void checkReset() {
+  // While the counter reset input is low, disable interrupts,
+  // reset the counter, loop around the LED display function.
+  if (digitalRead(RST) == LOW) {
+    noInterrupts();
+    resetCounter();
+    while (digitalRead(RST) == LOW) (
+      ledDisplay();
+    )
+    interrupts();
+  }
+}
+
+void resetCounter() {
+  // Resets the couter by setting the entire display array
+  // to zero, the bools negative and oneHour to false.
+  display[3] = 0;
+  display[2] = 0;
+  display[1] = 0;
+  display[0] = 0;
+  oneHour = false;
+  negative = false;
 }
 
 // ############################################################################################################
