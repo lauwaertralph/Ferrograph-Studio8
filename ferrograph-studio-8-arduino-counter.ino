@@ -23,13 +23,13 @@
 // ############################################################################################################
 
 // I/O Signal Pins
-const byte IMP = 21; // PORTD_0 - Arduino Pin 21 - INT0
-const byte DIR = 20; // PORTD_1 - Arduino Pin 20 - INT1
-const byte RST = 19; // PORTD_2 - Arduino Pin 19 - INT2
-const byte ROL = 18; // PORTD_3 - Arduino Pin 18 - INT3
+const byte IMP = 21;  // PORTD_0 - Arduino Pin 21 - INT0
+const byte DIR = 20;  // PORTD_1 - Arduino Pin 20 - INT1
+const byte RST = 19;  // PORTD_2 - Arduino Pin 19 - INT2
+const byte ROL = 2;   // PORTE_4 - Arduino Pin 2
 
 // DEBUG Pins
-const byte DBG_IMP = 2; // PORTE_4 - Arduino Pin 2
+// const byte DBG_IMP = 2; // PORTE_4 - Arduino Pin 2
 
 // ############################################################################################################
 // Global variables
