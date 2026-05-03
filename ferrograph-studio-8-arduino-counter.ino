@@ -305,10 +305,10 @@ void impulseInterrupt() {
 void checkReset() {
   // While the counter reset input is low, disable interrupts,
   // reset the counter, loop around the LED display function.
-  if (digitalRead(RST) == LOW) {
+  if (digitalRead(RST) == HIGH) {
     noInterrupts();
     resetCounter();
-    while (digitalRead(RST) == LOW) {
+    while (digitalRead(RST) == HIGH) {
       ledDisplay();
     }
     interrupts();
