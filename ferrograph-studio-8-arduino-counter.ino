@@ -308,9 +308,9 @@ void checkReset() {
   if (digitalRead(RST) == LOW) {
     noInterrupts();
     resetCounter();
-    while (digitalRead(RST) == LOW) (
+    while (digitalRead(RST) == LOW) {
       ledDisplay();
-    )
+    }
     interrupts();
   }
 }
