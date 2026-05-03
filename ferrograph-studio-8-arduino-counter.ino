@@ -78,7 +78,7 @@ void setup() {
   pinMode(IMP, INPUT);
   pinMode(DIR, INPUT);
 	pinMode(RST, INPUT);
-  // pinMode(ROL, OUTPUT);
+  pinMode(ROL, OUTPUT);
 
   // Interrupts
   attachInterrupt(digitalPinToInterrupt(DIR), determineCountingDirection, CHANGE);
