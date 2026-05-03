@@ -26,6 +26,7 @@
 const byte IMP = 21; // PORTD_0 - Arduino Pin 21 - INT0
 const byte DIR = 20; // PORTD_1 - Arduino Pin 20 - INT1
 const byte RST = 19; // PORTD_2 - Arduino Pin 19 - INT2
+const byte ROL = 18; // PORTD_3 - Arduino Pin 18 - INT3
 
 // DEBUG Pins
 const byte DBG_IMP = 2; // PORTE_4 - Arduino Pin 2
@@ -73,6 +74,9 @@ bool countingDirectionForward = true;
 // This controls the 7 segment display refresh rate. (microseconds)
 const long displayRefreshDelay = 1000;
 
+// This controls the length of the one hour rollover pulse. (microseconds)
+const long rolloverPulseLenght = 1000;
+
 void setup() {
   // I/O Setup
   // LED Displays Output (PORTF0:7)
@@ -83,6 +87,7 @@ void setup() {
   pinMode(IMP, INPUT);
   pinMode(DIR, INPUT);
 	pinMode(RST, INPUT);
+  pinMode(ROL, OUTPUT);
 
   // DEBUG I/O
   pinMode(DBG_IMP, OUTPUT);
@@ -101,6 +106,7 @@ void setup() {
 void loop() {
   ledDisplay();
   checkReset();
+  oneHourRollover(false);
 
   // Debug Counter
   //        (increment/decrement, interval)
@@ -170,6 +176,7 @@ void count(bool increment) {
           display[1] = 9;
           display[0] = 5;
           oneHour = false;
+          oneHourRollover(true);
         }
       } else if (display[0] > 0) {
         display[3] = 9;
@@ -202,6 +209,7 @@ void count(bool increment) {
           display[1] = 0;
           display[0] = 0;
           oneHour = true;
+          oneHourRollover(true);
         }
       } else if (display[0] < 9) {
           display[3] = 0;
@@ -236,6 +244,7 @@ void count(bool increment) {
           display[1] = 0;
           display[0] = 0;
           oneHour = true;
+          oneHourRollover(true);
         }
       } else if (display[0] < 9) {
           display[3] = 0;
@@ -268,6 +277,7 @@ void count(bool increment) {
           display[1] = 9;
           display[0] = 5;
           oneHour = false;
+          oneHourRollover(true);
         }
       } else if (display[0] > 0) {
         display[3] = 9;
@@ -279,6 +289,23 @@ void count(bool increment) {
         negative = true;
       }
     }
+  }
+}
+
+void oneHourRollover(bool start) {
+  unsigned long timeNow = micros();
+  static unsigned long timelast = 0;
+  static bool rollover = false;
+
+  if (rollover == true) {
+    if (timeNow - timelast >= rolloverPulseLenght) {
+      rollover = false;
+      digitalWrite(ROL, LOW);
+    }
+  } else if (start == true) {
+    timelast = timeNow;
+    rollover = true;
+    digitalWrite(ROL, HIGH);
   }
 }
 
