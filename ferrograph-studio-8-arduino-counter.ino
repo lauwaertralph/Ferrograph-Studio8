@@ -62,12 +62,6 @@ byte display[4] = { 0,    0,    0,    0    };
 // Used for disabling the counter during reset.
 bool enableCounter = true;
 
-// Keeps track if the counter is more than one hour.
-bool oneHour = false;
-
-// Keeps track if the counter in negative.
-bool negative = false;
-
 // Keeps track of the counting direction.
 bool countingDirectionForward = true;
 
@@ -89,6 +83,9 @@ void setup() {
 	pinMode(RST, INPUT);
   pinMode(ROL, OUTPUT);
 
+  // Set initial state of rollover output signal to LOW
+  digitalWrite(ROL, LOW);
+
   // DEBUG I/O
   pinMode(DBG_IMP, OUTPUT);
 
@@ -106,7 +103,7 @@ void setup() {
 void loop() {
   ledDisplay();
   checkReset();
-  oneHourRollover(false);
+  counterRollover(false);
 
   // Debug Counter
   //        (increment/decrement, interval)
@@ -153,146 +150,54 @@ void ledDisplay() {
 }
 
 void count(bool increment) {
-  if (increment){
-    if (negative == true) {
-      if (display[3] > 0) {
-        display[3]--;
-      } else if (display[2] > 0) {
-        display[3] = 9;
-        display[2]--;
-      } else if (display[1] > 0) {
-        display[3] = 0;
-        display[2] = 5;
-        display[1]--;
-      } else if (oneHour == true) {
-        if (display[0] < 0) {
-          display[3] = 9;
-          display[2] = 5;
-          display[1] = 9;
-          display[0]--;
-        } else {
-          display[3] = 9;
-          display[2] = 5;
-          display[1] = 9;
-          display[0] = 5;
-          oneHour = false;
-          oneHourRollover(true);
-        }
-      } else if (display[0] > 0) {
-        display[3] = 9;
-        display[2] = 5;
-        display[1] = 9;
-        display[0]--;
-      } else {
-        display[3]++;
-        negative = false;
-      }
+  if (increment) {
+    if (display[3] < 9) {
+      display[3]++;
+    } else if (display[2] < 5) {
+      display[3] = 0;
+      display[2]++;
+    } else if (display[1] < 9) {
+      display[3] = 0;
+      display[2] = 0;
+      display[1]++;
+    } else if (display[0] < 9) {
+      display[3] = 0;
+      display[2] = 0;
+      display[1] = 0;
+      display[0]++;
     } else {
-      if (display[3] < 9) {
-        display[3]++;
-      } else if (display[2] < 5) {
-        display[3] = 0;
-        display[2]++;
-      } else if (display[1] < 9) {
-        display[3] = 0;
-        display[2] = 0;
-        display[1]++;
-      } else if (oneHour == false) {
-        if (display[0] < 5) {
-          display[3] = 0;
-          display[2] = 0;
-          display[1] = 0;
-          display[0]++;
-        } else {
-          display[3] = 0;
-          display[2] = 0;
-          display[1] = 0;
-          display[0] = 0;
-          oneHour = true;
-          oneHourRollover(true);
-        }
-      } else if (display[0] < 9) {
-          display[3] = 0;
-          display[2] = 0;
-          display[1] = 0;
-          display[0]++;
-      } else {
-        display[3]--;
-        negative = true;
-      }
+      display[3] = 0;
+      display[2] = 0;
+      display[1] = 0;
+      display[0] = 0;
+      counterRollover(true);
     }
   } else {
-    if (negative == true) {
-      if (display[3] < 9) {
-        display[3]++;
-      } else if (display[2] < 5) {
-        display[3] = 0;
-        display[2]++;
-      } else if (display[1] < 9) {
-        display[3] = 0;
-        display[2] = 0;
-        display[1]++;
-      } else if (oneHour == false) {
-        if (display[0] < 5) {
-          display[3] = 0;
-          display[2] = 0;
-          display[1] = 0;
-          display[0]++;
-        } else {
-          display[3] = 0;
-          display[2] = 0;
-          display[1] = 0;
-          display[0] = 0;
-          oneHour = true;
-          oneHourRollover(true);
-        }
-      } else if (display[0] < 9) {
-          display[3] = 0;
-          display[2] = 0;
-          display[1] = 0;
-          display[0]++;
-      } else {
-        display[3]--;
-        negative = false;
-      }
+    if (display[3] > 0) {
+      display[3]--;
+    } else if (display[2] > 0) {
+      display[3] = 9;
+      display[2]--;
+    } else if (display[1] > 0) {
+      display[3] = 0;
+      display[2] = 5;
+      display[1]--;
+    } else if (display[0] > 0) {
+      display[3] = 9;
+      display[2] = 5;
+      display[1] = 9;
+      display[0]--;
     } else {
-      if (display[3] > 0) {
-        display[3]--;
-      } else if (display[2] > 0) {
-        display[3] = 9;
-        display[2]--;
-      } else if (display[1] > 0) {
-        display[3] = 0;
-        display[2] = 5;
-        display[1]--;
-      } else if (oneHour == true) {
-        if (display[0] < 0) {
-          display[3] = 9;
-          display[2] = 5;
-          display[1] = 9;
-          display[0]--;
-        } else {
-          display[3] = 9;
-          display[2] = 5;
-          display[1] = 9;
-          display[0] = 5;
-          oneHour = false;
-          oneHourRollover(true);
-        }
-      } else if (display[0] > 0) {
-        display[3] = 9;
-        display[2] = 5;
-        display[1] = 9;
-        display[0]--;
-      } else {
-        display[3]++;
-        negative = true;
-      }
+      display[3] = 9;
+      display[2] = 5;
+      display[1] = 9;
+      display[0] = 9;
+      counterRollover(true);
     }
   }
 }
 
-void oneHourRollover(bool start) {
+void counterRollover(bool start) {
   unsigned long timeNow = micros();
   static unsigned long timelast = 0;
   static bool rollover = false;
@@ -345,14 +250,11 @@ void checkReset() {
 }
 
 void resetCounter() {
-  // Resets the couter by setting the entire display array
-  // to zero, the bools negative and oneHour to false.
+  // Resets the couter by setting the entire display array to zero.
   display[3] = 0;
   display[2] = 0;
   display[1] = 0;
   display[0] = 0;
-  oneHour = false;
-  negative = false;
 }
 
 // ############################################################################################################
