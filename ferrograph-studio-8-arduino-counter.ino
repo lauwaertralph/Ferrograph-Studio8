@@ -28,9 +28,6 @@ const byte DIR = 20;  // PORTD_1 - Arduino Pin 20 - INT1
 const byte RST = 19;  // PORTD_2 - Arduino Pin 19 - INT2
 const byte ROL = 2;   // PORTE_4 - Arduino Pin 2
 
-// DEBUG Pins
-// const byte DBG_IMP = 2; // PORTE_4 - Arduino Pin 2
-
 // ############################################################################################################
 // Global variables
 // ############################################################################################################
@@ -83,12 +80,6 @@ void setup() {
 	pinMode(RST, INPUT);
   pinMode(ROL, OUTPUT);
 
-  // Set initial state of rollover output signal to LOW
-  digitalWrite(ROL, LOW);
-
-  // DEBUG I/O
-  pinMode(DBG_IMP, OUTPUT);
-
   // Interrupts
   attachInterrupt(digitalPinToInterrupt(DIR), determineCountingDirection, CHANGE);
   attachInterrupt(digitalPinToInterrupt(IMP), impulseInterrupt, FALLING);
@@ -104,11 +95,6 @@ void loop() {
   ledDisplay();
   checkReset();
   counterRollover(false);
-
-  // Debug Counter
-  //        (increment/decrement, interval)
-  // debugCount(true,                50000   );
-  // debugImpulseInterrupt(50000);
 }
 
 // ############################################################################################################
@@ -255,32 +241,4 @@ void resetCounter() {
   display[2] = 0;
   display[1] = 0;
   display[0] = 0;
-}
-
-// ############################################################################################################
-// Debugging Functions
-// ############################################################################################################
-
-void debugCount(bool increment, long interval) {
-  unsigned long timeNow = micros();
-  static unsigned long timelast = 0;
-
-  if ((timelast + interval) <= timeNow) {
-    timelast = timeNow;
-    count(increment);
-  }
-}
-
-void debugImpulseInterrupt(long interval) {
-  unsigned long timeNow = micros();
-  static unsigned long timelast = 0;
-
-  if (timelast + (interval / 2) <= timeNow) {
-    timelast = timeNow;
-    if (digitalRead(DBG_IMP) == LOW) {
-      digitalWrite(DBG_IMP, HIGH);
-    } else {
-      digitalWrite(DBG_IMP, LOW);
-    }
-  }
 }
